@@ -5,8 +5,10 @@
 # Summary
 [summary]: #summary
 
-This RFC proposes a standard package structure for REF packages. 
-The goal is to make it easier for developers to find and understand the contents of a REF package.
+This RFC proposes how we should structure the git repository to enable the rapid development of the project while it is immature.
+The core of the project will have some reuse outside of the REF frontend
+so it should be publishable as a separate package.
+The goal is to make it easier for users to extend the project with new metrics providers.
 
 # Motivation
 [motivation]: #motivation
@@ -48,10 +50,15 @@ This allows us to keep the core functionality separate from the metrics provider
 
 ### `ref-metrics-*`
 Each metric provider will implement a separate package that implements the interfaces described by the `ref-core` package.
+These will very thin packages that wrap around the existing APIs of the benchmarking packages or use CMEC to execute.
+
+An example package `ref-metrics-example` has been implemented in [CMIP-REF/cmip-ref#5](https://github.com/CMIP-REF/cmip-ref/pull/5).
+See the [code](https://github.com/CMIP-REF/cmip-ref/tree/basic-interface/packages/ref-metrics-example) for more details.
 
 The purpose of these packages are to provide a Python-based hook to execute a metric and return the results.
 This will include (hopefully thin) wrappers around the metric providers existing APIs
 or build the required CMEC configuration files.
+It should require little to no change to the existing codebase benchmarking packages.
 
 The repository will set up a CI pipeline that will run the unit tests for each package.
 This includes fetching some sample data.
