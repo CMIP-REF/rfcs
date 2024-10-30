@@ -24,14 +24,15 @@ It is proposed that we start with a mono-repo structure consisting of multiple p
 each with their own set of dependencies.
 The tooling and CI will be shared across all projects.
 There will be a `packages` directory at the root of the repo, with each package in its own subdirectory.
+An example has been implemented in [CMIP-REF/cmip-ref#1](https://github.com/CMIP-REF/cmip-ref/pull/0001),
+which contains a `ref-core` package and an example `ref-metrics-example` package.
 
 Each package will have a `README.md` file that describes the purpose of the package and how to use it,
 its own `pyproject.toml` describing the package and it's dependencies, 
 and their own set of tests.
 The test suite for each package is run with only the dependencies required for that package.
 
-An example has been implemented in [CMIP-REF/cmip-ref#1](https://github.com/CMIP-REF/cmip-ref/pull/0001),
-which contains a `ref-core` package and an example `ref-metrics-example` package.
+A common set of integration tests will also be run to ensure that the packages work together.
 
 The purpose of this structure is to split the project into smaller, more manageable parts
 and to differentiate between the "library" part of the project which is reusable
@@ -52,6 +53,9 @@ The purpose of these packages are to provide a Python-based hook to execute a me
 This will include (hopefully thin) wrappers around the metric providers existing APIs
 or build the required CMEC configuration files.
 
+The repository will set up a CI pipeline that will run the unit tests for each package.
+This includes fetching some sample data.
+
 These packages will maintain their own dependencies (python and otherwise) and packaged up as a docker image.
 
 The package will be named `ref-metrics-<provider>` where `<provider>` is the name of the provider.
@@ -63,7 +67,7 @@ tracks the execution of metrics and the results.
 The package may have indirect dependencies on the metrics packages to avoid conflicting dependencies.
 That adds additional complexity, but will be more flexible in the long run.
 
-This is the service that will be deployed to ESGF.
+This is the service that will be deployed to ESGF alongside any additional services that are required.
 
 Whether this application can be done solely via a CLI-based tool is up for debate.
 
@@ -71,7 +75,7 @@ Whether this application can be done solely via a CLI-based tool is up for debat
 [drawbacks]: #drawbacks
 
 * More people working in the same repository may lead to more merge conflicts.
-* Larger repository with more moving parts
+* Larger repository with more moving parts/concepts
 
 
 Another drawback is that it will be harder to manage different package managers.
@@ -79,7 +83,7 @@ The project currently uses [uv](https://docs.astral.sh/uv/) as a package manager
 will not require any complex to install dependencies, 
 but science packages may require more complex dependencies.
 There is nothing stopping the use of something like [pixi](https://pixi.sh/dev/) when conda-based
-dependencies are required.
+dependencies are required for a particular package.
 
 The CI times may become longer. This may be somewhat insidious
 as at the beginning the developer experience will be great.
@@ -87,9 +91,12 @@ This will gradually degrade as the number of packages/providers increases.
 The test for each provider can be run as a separate job.
 We may also choose to target a single Python version if it becomes an issue.
 
-
 # Rationale and alternatives
 [rationale-and-alternatives]: #rationale-and-alternatives
+
+A mono-repo structure will enable the rapid development of the project while it is immature
+and in a state of flux.
+It will be easier to refactor code as it is all in the same repository.
 
 - Splitting out each package to a separate repository is a possibility
 and is a very common approach in the Python community.
@@ -108,10 +115,10 @@ published multiple packages to PyPI from a single repository.
 It worked well for that project as it enabled clearer separations and reuse of parts of the codebase
 without depending on a much larger package.
 
-
 # Unresolved questions
 [unresolved-questions]: #unresolved-questions
-None
+
+* An example that uses `pixi` to install conda packages would be useful as a proof of concept.
 
 # Future possibilities
 [future-possibilities]: #future-possibilities
